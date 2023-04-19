@@ -6,16 +6,13 @@ import openai
 import os
 
 from dotenv import load_dotenv, find_dotenv
-import git as git_module
 
 import os
 import uuid
-import pinecone
 from langchain.vectorstores import Pinecone
 from langchain.embeddings import OpenAIEmbeddings
 from langchain import PromptTemplate
 from langchain.llms import OpenAI
-from git import Repo
 from langchain.document_loaders import DirectoryLoader, NotebookLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import openai
