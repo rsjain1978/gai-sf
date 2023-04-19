@@ -47,37 +47,32 @@ def init():
         environment=os.getenv("PINECONE_ENV")
     )
     
-    global index_name
-    index_name = 'sfindex'
+    # global index_name
+    # index_name = 'sfindex'
     
-    # check if index already exists (it shouldn't if this is first time)
-    if index_name not in pinecone.list_indexes():
+    # # check if index already exists (it shouldn't if this is first time)
+    # if index_name not in pinecone.list_indexes():
         
-        print ('Index not present, creating')
+    #     print ('Index not present, creating')
         
-        # if does not exist, create index
-        pinecone.create_index(
-            index_name,
-            dimension=1024
-        )
+    #     # if does not exist, create index
+    #     pinecone.create_index(
+    #         index_name,
+    #         dimension=1024
+    #     )
         
-    # connect to index
-    global index
-    index = pinecone.Index(index_name)
-    print ('Index loaded')
+    # # connect to index
+    # global index
+    # index = pinecone.Index(index_name)
+    # print ('Index loaded')
 
 @app.route('/api/summarise/notes', methods=['POST'])
 def summarise():
     data = request.get_json()
-    notes = data.get('notes')
+    notes = data['notes']
 
     # build our prompt with the retrieved contexts included
-    prompt_start = (
-        "You are a sales professional. Summarise the minutes of meeting passed in the context below. Stick to the facts mentioned in the context.\n\n"+
-        "Context:\n"
-    )
-
-    prompt = prompt_start.join(notes)
+    prompt = "You are a sales professional. Summarise the minutes of meeting passed in the context below. Stick to the facts mentioned in the context.\n\n"+"Context:\n" + notes    
     print (prompt)
 
     summary = llm_model(prompt) 
@@ -85,5 +80,5 @@ def summarise():
     return jsonify({'summary': summary})
 
 if __name__ == '__main__':
-    # init()
-    app.run(debug=False)
+    init()
+    app.run(debug=True)
