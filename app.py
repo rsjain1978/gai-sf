@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from flask_httpauth import HTTPBasicAuth
 import requests
 from bs4 import BeautifulSoup
 import openai
@@ -23,6 +24,18 @@ index = None
 
 app = Flask(__name__)
 CORS(app)
+auth = HTTPBasicAuth()
+
+# Add this function to verify the username and password
+@auth.verify_password
+def verify_password(username, password):
+    if username and password:
+        # You can replace these values with the ones from your environment variables or database
+        correct_username = "gaii_sf_user_1"
+        correct_password = "gaii_sf_password_1"
+        if username == correct_username and password == correct_password:
+            return True
+    return False
 
 def init():
     
@@ -38,34 +51,15 @@ def init():
                        temperature=0.7,
                        n=1)
 
-   
-    # global index_name
-    # index_name = 'sfindex'
-    
-    # # check if index already exists (it shouldn't if this is first time)
-    # if index_name not in pinecone.list_indexes():
-        
-    #     print ('Index not present, creating')
-        
-    #     # if does not exist, create index
-    #     pinecone.create_index(
-    #         index_name,
-    #         dimension=1024
-    #     )
-        
-    # # connect to index
-    # global index
-    # index = pinecone.Index(index_name)
-    # print ('Index loaded')
-
 @app.route('/api/summarise/notes', methods=['POST'])
+@auth.login_required  # Add this decorator to protect the route
 def summarise():
     data = request.get_json()
     notes = data['notes']
     prompt = data['prompt']
 
     # build our prompt with the retrieved contexts included
-    final_prompt = prompt = "\n\n" + notes
+    final_prompt = prompt + "\n\n {CONTEXT} - " + notes
 
     summary = llm_model(final_prompt) 
     print (summary)
@@ -73,4 +67,4 @@ def summarise():
 
 if __name__ == '__main__':
     init()
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
