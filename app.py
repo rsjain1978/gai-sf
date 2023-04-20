@@ -9,7 +9,6 @@ from dotenv import load_dotenv, find_dotenv
 
 import os
 import uuid
-from langchain.vectorstores import Pinecone
 from langchain.embeddings import OpenAIEmbeddings
 from langchain import PromptTemplate
 from langchain.llms import OpenAI
@@ -39,11 +38,7 @@ def init():
                        temperature=0.7,
                        n=1)
 
-    pinecone.init(
-        api_key=os.getenv("PINECONE_API_KEY"),
-        environment=os.getenv("PINECONE_ENV")
-    )
-    
+   
     # global index_name
     # index_name = 'sfindex'
     
@@ -67,12 +62,12 @@ def init():
 def summarise():
     data = request.get_json()
     notes = data['notes']
+    prompt = data['prompt']
 
     # build our prompt with the retrieved contexts included
-    prompt = "You are a sales professional. Summarise the minutes of meeting passed in the context below. Stick to the facts mentioned in the context.\n\n"+"Context:\n" + notes    
-    print (prompt)
+    final_prompt = prompt = "\n\n" + notes
 
-    summary = llm_model(prompt) 
+    summary = llm_model(final_prompt) 
     print (summary)
     return jsonify({'summary': summary})
 
